@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Join FilmReview{% endblock %}
+{% block content %}
+<section class="auth-section">
+    <div class="auth-card">
+        <div class="auth-header">
+            <span class="auth-icon">◈</span>
+            <h1 class="auth-title">Join the conversation.</h1>
+            <p class="auth-sub">Create an account to start reviewing.</p>
+        </div>
+        <form class="auth-form" method="POST" action="{{ url_for('register') }}">
+            <div class="form-group">
+                <label class="form-label" for="username">Username</label>
+                <input type="text" id="username" name="username" class="form-input" placeholder="Pick a name" required minlength="3" autocomplete="username">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="email">Email</label>
+                <input type="email" id="email" name="email" class="form-input" placeholder="your@email.com" required autocomplete="email">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="password">Password</label>
+                <input type="password" id="password" name="password" class="form-input" placeholder="Min 6 characters" required minlength="6" autocomplete="new-password">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="confirm">Confirm Password</label>
+                <input type="password" id="confirm" name="confirm" class="form-input" placeholder="Repeat password" required autocomplete="new-password">
+            </div>
+            <button type="submit" class="btn-primary btn-full">Create Account →</button>
+        </form>
+        <p class="auth-switch">
+            Already a member? <a href="{{ url_for('login') }}">Log in</a>
+        </p>
+    </div>
+</section>
+{% endblock %}

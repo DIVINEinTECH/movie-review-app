@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}FilmReview — Browse Reviews{% endblock %}
+{% block content %}
+<section class="hero">
+    <div class="hero-tagline">
+        <span class="tagline-label">The Critics' Corner</span>
+    </div>
+    <h1 class="hero-title">
+        Every story<br><em>deserves</em> a verdict.
+    </h1>
+    {% if stats and stats['total'] > 0 %}
+    <div class="hero-stats">
+        <div class="stat">
+            <span class="stat-num">{{ stats['total'] }}</span>
+            <span class="stat-label">Reviews</span>
+        </div>
+        <div class="stat-divider">◆</div>
+        <div class="stat">
+            <span class="stat-num">{{ stats['movies'] or 0 }}</span>
+            <span class="stat-label">Films</span>
+        </div>
+        <div class="stat-divider">◆</div>
+        <div class="stat">
+            <span class="stat-num">{{ stats['series'] or 0 }}</span>
+            <span class="stat-label">Series</span>
+        </div>
+        <div class="stat-divider">◆</div>
+        <div class="stat">
+            <span class="stat-num">{{ stats['avg_rating'] or '—' }}</span>
+            <span class="stat-label">Avg Rating</span>
+        </div>
+    </div>
+    {% endif %}
+</section>
+<section class="browse-section">
+    <form class="controls-bar" method="GET" action="{{ url_for('index') }}">
+        <div class="search-wrap">
+            <span class="search-icon">⌕</span>
+            <input type="text" name="q" class="search-input" placeholder="Search titles or reviews…" value="{{ query }}" autocomplete="off">
+            {% if query %}
+                <a href="{{ url_for('index') }}" class="search-clear">✕</a>
+            {% endif %}
+        </div>
+        <div class="filter-group">
+            <a href="{{ url_for('index', q=query, type='all', sort=sort) }}" class="filter-pill {% if filter_type == 'all' %}active{% endif %}">All</a>
+            <a href="{{ url_for('index', q=query, type='movie', sort=sort) }}" class="filter-pill {% if filter_type == 'movie' %}active{% endif %}">🎬 Films</a>
+            <a href="{{ url_for('index', q=query, type='series', sort=sort) }}" class="filter-pill {% if filter_type == 'series' %}active{% endif %}">📺 Series</a>
+        </div>
+        <div class="sort-group">
+            <a href="{{ url_for('index', q=query, type=filter_type, sort='latest') }}" class="sort-pill {% if sort == 'latest' %}active{% endif %}">Latest</a>
+            <a href="{{ url_for('index', q=query, type=filter_type, sort='top') }}" class="sort-pill {% if sort == 'top' %}active{% endif %}">Top Rated</a>
+        </div>
+    </form>
+    {% if query %}
+        <p class="results-label">
+            {% if reviews %}
+                {{ reviews|length }} result{{ 's' if reviews|length != 1 }} for "<strong>{{ query }}</strong>"
+            {% else %}
+                No results for "<strong>{{ query }}</strong>"
+            {% endif %}
+        </p>
+    {% endif %}
+    {% if reviews %}
+        <div class="reviews-grid">
+            {% for review in reviews %}
+            <article class="review-card" data-type="{{ review['type'] }}">
+                <a href="{{ url_for('review_detail', review_id=review['id']) }}" class="card-link">
+                    <div class="card-header">
+                        <span class="card-type {{ review['type'] }}">
+                            {{ '🎬' if review['type'] == 'movie' else '📺' }}
+                            {{ review['type']|capitalize }}
+                        </span>
+                        <div class="card-rating">
+                            {% for i in range(1, 6) %}
+                                <span class="star {% if i <= review['rating'] %}filled{% endif %}">★</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <h2 class="card-title">{{ review['title'] }}</h2>
+                    <p class="card-excerpt">{{ review['review_text'][:140] }}{% if review['review_text']|length > 140 %}…{% endif %}</p>
+                    <div class="card-footer">
+                        <span class="card-author">by {{ review['username'] }}</span>
+                        <span class="card-date">{{ review['created_at'][:10] }}</span>
+                    </div>
+                </a>
+                {% if session.user_id == review['user_id'] %}
+                <form method="POST" action="{{ url_for('delete_review', review_id=review['id']) }}" class="delete-form" onsubmit="return confirm('Delete this review?')">
+                    <button type="submit" class="delete-btn" title="Delete">✕</button>
+                </form>
+                {% endif %}
+            </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <span class="empty-icon">◈</span>
+            <p class="empty-title">No reviews yet.</p>
+            {% if session.user_id %}
+                <a href="{{ url_for('submit') }}" class="btn-primary">Be the first →</a>
+            {% else %}
+                <a href="{{ url_for('register') }}" class="btn-primary">Join to review →</a>
+            {% endif %}
+        </div>
+    {% endif %}
+</section>
+{% endblock %}
