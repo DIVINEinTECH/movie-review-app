@@ -1,4 +1,4 @@
- film-review-site
+movie-review-app
 
 A full-stack movie and series review app with user authentication, star ratings, search and filtering. Built with Python Flask and SQLite.
 
